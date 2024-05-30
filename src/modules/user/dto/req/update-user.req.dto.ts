@@ -8,8 +8,7 @@ import {
   Max,
   Min,
 } from 'class-validator';
-
-import { TransformHelper } from '../../../common/helpers/transform.helper';
+import { TransformHelper } from 'src/common/helpers/transform.helper';
 
 export class UpdateUserReqDto {
   @IsString()

@@ -12,9 +12,10 @@ import {
   ValidateNested,
 } from 'class-validator';
 
-import { TransformHelper } from '../../../common/helpers/transform.helper';
+import { TransformHelper } from '../../../../common/helpers/transform.helper';
 
 const date = new Date();
+
 class carReqDto {
   @IsString()
   @Transform(TransformHelper.trim)
