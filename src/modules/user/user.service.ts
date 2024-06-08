@@ -1,11 +1,15 @@
 import { Injectable } from '@nestjs/common';
 
+import { LoggerService } from '../logger/logger.service';
 import { CreateUserReqDto } from './dto/req/create-user.req.dto';
 import { UpdateUserReqDto } from './dto/req/update-user.req.dto';
 
 @Injectable()
 export class UserService {
+  constructor(private readonly logger: LoggerService) {}
   public async create(createUserDto: CreateUserReqDto): Promise<any> {
+    this.logger.log('This action adds a new user');
+    throw new Error('This action adds a new user');
     return `This action adds a new ${createUserDto} user`;
   }
 

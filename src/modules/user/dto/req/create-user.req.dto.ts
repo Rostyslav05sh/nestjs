@@ -8,70 +8,62 @@ import {
   Length,
   Matches,
   Max,
+  MaxLength,
   Min,
+  ValidateIf,
   ValidateNested,
 } from 'class-validator';
 
 import { TransformHelper } from '../../../../common/helpers/transform.helper';
 
-const date = new Date();
-
-class carReqDto {
+class CarReqDto {
   @IsString()
-  @Transform(TransformHelper.trim)
-  @Length(3, 20)
-  brand: string;
-
-  @IsNumber()
-  @Type(() => Number)
-  @Max(date.getFullYear())
-  @Min(1984)
-  year: number;
+  @MaxLength(255)
+  producer: string;
 
   @IsString()
-  @Transform(TransformHelper.trim)
-  @Transform(TransformHelper.toLowerCase)
-  @Length(3, 50)
   model: string;
 }
 
 export class CreateUserReqDto {
   @IsString()
-  @Length(3, 25)
+  @Length(3, 30)
   @Transform(TransformHelper.trim)
   public readonly name: string;
 
-  @IsString()
-  @Length(3, 25)
-  @Transform(TransformHelper.trim)
-  @Matches(/^(?=.*d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/, {
-    message:
-      'must contain Upper and Lower case letter, number and special symbol',
+  @Matches(/^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/, {
+    message: 'Invalid email',
   })
-  public readonly password: string;
-
   @IsString()
-  @Max(100)
   @Transform(TransformHelper.trim)
-  @Matches(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/)
+  @Transform(TransformHelper.toLowerCase)
   public readonly email: string;
 
+  @Matches(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/, {
+    message: 'Invalid password',
+  })
   @IsString()
-  @Max(255)
+  @Transform(TransformHelper.trim)
+  public readonly password: string;
+
   @IsOptional()
+  @IsString()
+  @ValidateIf((object) => object.age > 25)
+  @MaxLength(255)
+  @Transform(TransformHelper.trim)
   public readonly avatar?: string;
 
+  @IsInt()
   @IsNumber()
+  @Min(18)
+  @Max(150)
   @IsOptional()
   @Type(() => Number)
-  @IsInt()
-  @Max(110)
-  @Min(16)
   public readonly age?: number;
 
   @IsOptional()
   @IsObject()
-  @Type(() => carReqDto)
+  @Type(() => CarReqDto)
   @ValidateNested({ each: true })
-  public readonly car: carReqDto;
+  car: CarReqDto;
 }
