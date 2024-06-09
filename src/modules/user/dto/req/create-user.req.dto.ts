@@ -65,5 +65,5 @@ export class CreateUserReqDto {
   @IsObject()
   @Type(() => CarReqDto)
   @ValidateNested({ each: true })
-  car: CarReqDto;
+  car?: CarReqDto;
 }
