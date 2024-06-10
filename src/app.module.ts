@@ -7,6 +7,7 @@ import configuration from './configs/config';
 import { AuthModule } from './modules/auth/auth.module';
 import { LoggerModule } from './modules/logger/logger.module';
 import { PostgresModule } from './modules/postgres/postgres.module';
+import { RedisModule } from './modules/redis/redis.module';
 import { RepositoryModule } from './modules/repository/repository.module';
 import { UserModule } from './modules/user/user.module';
 
@@ -19,6 +20,7 @@ import { UserModule } from './modules/user/user.module';
     RepositoryModule,
     LoggerModule,
     PostgresModule,
+    RedisModule,
     UserModule,
     AuthModule,
   ],

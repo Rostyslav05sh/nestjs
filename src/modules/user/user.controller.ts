@@ -1,12 +1,4 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiForbiddenResponse,
@@ -15,11 +7,9 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 
-import { CreateUserReqDto } from './dto/req/create-user.req.dto';
 import { UpdateUserReqDto } from './dto/req/update-user.req.dto';
-import { PrivateUserResDto } from './dto/res/private-user.res.dto';
-import { PublicUserResDto } from './dto/res/public-user.res.dto';
-import { UserService } from './user.service';
+import { UserResDto } from './dto/res/user.res.dto';
+import { UserService } from './services/user.service';
 
 @ApiBearerAuth()
 @ApiTags('Users')
@@ -30,18 +20,8 @@ export class UserController {
   @ApiForbiddenResponse({ description: 'Forbidden' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @ApiNotFoundResponse({ description: 'Not Found' })
-  @Post()
-  public async create(
-    @Body() dto: CreateUserReqDto,
-  ): Promise<PrivateUserResDto> {
-    return await this.userService.create(dto);
-  }
-
-  @ApiForbiddenResponse({ description: 'Forbidden' })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  @ApiNotFoundResponse({ description: 'Not Found' })
   @Get(':id')
-  public async findOne(@Param('id') id: string): Promise<PublicUserResDto> {
+  public async findOne(@Param('id') id: string): Promise<UserResDto> {
     return await this.userService.findOne(id);
   }
 

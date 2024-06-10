@@ -24,4 +24,10 @@ export default (): Config => ({
     environment: process.env.SENTRY_ENVIRONMENT,
     debug: process.env.SENTRY_DEBUG === 'true',
   },
+  jwt: {
+    accesToken: process.env.accesToken,
+    accesExpiresIn: parseInt(process.env.accesExpiresIn),
+    refreshToken: process.env.refreshToken,
+    refreshExpiresIn: parseInt(process.env.refreshExpiresIn),
+  },
 });
