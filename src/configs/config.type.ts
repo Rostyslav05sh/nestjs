@@ -32,8 +32,8 @@ export type sentryConfig = {
 };
 
 export type JWTConfig = {
-  accesToken: string;
+  accesSecret: string;
   accesExpiresIn: number;
-  refreshToken: string;
+  refreshSecret: string;
   refreshExpiresIn: number;
 };

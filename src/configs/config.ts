@@ -25,9 +25,9 @@ export default (): Config => ({
     debug: process.env.SENTRY_DEBUG === 'true',
   },
   jwt: {
-    accesToken: process.env.accesToken,
+    accesSecret: process.env.accesToken,
     accesExpiresIn: parseInt(process.env.accesExpiresIn),
-    refreshToken: process.env.refreshToken,
+    refreshSecret: process.env.refreshToken,
     refreshExpiresIn: parseInt(process.env.refreshExpiresIn),
   },
 });
