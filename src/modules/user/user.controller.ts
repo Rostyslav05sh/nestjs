@@ -6,6 +6,7 @@ import {
   Param,
   ParseUUIDPipe,
   Patch,
+  Post,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -16,7 +17,7 @@ import {
 } from '@nestjs/swagger';
 
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
-import { skipAuth } from '../auth/decorators/skip-auth.decorator';
+import { SkipAuth } from '../auth/decorators/skip-auth.decorator';
 import { IUserData } from '../auth/interfaces/user-data.interface';
 import { UpdateUserReqDto } from './dto/req/update-user.req.dto';
 import { UserResDto } from './dto/res/user.res.dto';
@@ -27,39 +28,68 @@ import { UserService } from './services/user.service';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @skipAuth()
+  @ApiBearerAuth()
   @ApiForbiddenResponse({ description: 'Forbidden' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @ApiNotFoundResponse({ description: 'Not Found' })
-  @Get(':id')
-  public async findOne(
-    @Param('id', ParseUUIDPipe) id: string,
-  ): Promise<UserResDto> {
-    return await this.userService.findOne(id);
+  @Get('me')
+  public async getMe(@CurrentUser() userData: IUserData): Promise<UserResDto> {
+    return await this.userService.getMe(userData);
   }
 
   @ApiBearerAuth()
   @ApiForbiddenResponse({ description: 'Forbidden' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @ApiNotFoundResponse({ description: 'Not Found' })
-  @Patch(':id')
+  @Patch('me')
   public async update(
     @CurrentUser() userData: IUserData,
-    @Param('id', ParseUUIDPipe) id: string,
-    @Body() updateUserDto: UpdateUserReqDto,
-  ): Promise<any> {
-    return await this.userService.update(userData, updateUserDto);
+    @Body() dto: UpdateUserReqDto,
+  ): Promise<UserResDto> {
+    return await this.userService.update(userData, dto);
   }
 
   @ApiBearerAuth()
   @ApiForbiddenResponse({ description: 'Forbidden' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @ApiNotFoundResponse({ description: 'Not Found' })
-  @Delete(':id')
-  public async remove(
+  @Delete('me')
+  public async remove(@CurrentUser() userData: IUserData): Promise<void> {
+    await this.userService.remove(userData);
+  }
+
+  @SkipAuth()
+  @ApiForbiddenResponse({ description: 'Forbidden' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiNotFoundResponse({ description: 'Not Found' })
+  @Get(':userId')
+  public async getById(
+    @Param('userId', ParseUUIDPipe) userId: string,
+  ): Promise<UserResDto> {
+    return await this.userService.getById(userId);
+  }
+
+  @ApiBearerAuth()
+  @ApiForbiddenResponse({ description: 'Forbidden' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiNotFoundResponse({ description: 'Not Found' })
+  @Post(':userId/follow')
+  public async follow(
     @CurrentUser() userData: IUserData,
-    @Param('id', ParseUUIDPipe) id: string,
-  ): Promise<any> {
-    return await this.userService.remove(id);
+    @Param('userId', ParseUUIDPipe) userId: string,
+  ): Promise<void> {
+    await this.userService.follow(userData, userId);
+  }
+
+  @ApiBearerAuth()
+  @ApiForbiddenResponse({ description: 'Forbidden' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiNotFoundResponse({ description: 'Not Found' })
+  @Post(':userId/unfollow')
+  public async unfollow(
+    @CurrentUser() userData: IUserData,
+    @Param('userId', ParseUUIDPipe) userId: string,
+  ): Promise<void> {
+    await this.userService.unfollow(userData, userId);
   }
 }

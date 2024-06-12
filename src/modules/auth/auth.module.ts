@@ -24,5 +24,6 @@ import { TokenService } from './services/token.service';
     },
     JwtRefreshGuard,
   ],
+  exports: [],
 })
 export class AuthModule {}

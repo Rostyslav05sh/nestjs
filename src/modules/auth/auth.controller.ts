@@ -2,7 +2,7 @@ import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { CurrentUser } from './decorators/current-user.decorator';
-import { skipAuth } from './decorators/skip-auth.decorator';
+import { SkipAuth } from './decorators/skip-auth.decorator';
 import { SignInReqDto } from './dto/req/sign-in.req.dto';
 import { SignUpReqDto } from './dto/req/sign-up.req.dto';
 import { AuthResDto } from './dto/res/auth.res.dto';
@@ -16,17 +16,19 @@ import { AuthService } from './services/auth.service';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @skipAuth()
+  @SkipAuth()
+  @ApiOperation({ summary: 'Sign up' })
   @Post('sign-up')
   public async singUp(@Body() dto: SignUpReqDto): Promise<AuthResDto> {
     return await this.authService.signUp(dto);
   }
-  @skipAuth()
+  @SkipAuth()
+  @ApiOperation({ summary: 'Sign in' })
   @Post('sign-in')
   public async signIn(@Body() dto: SignInReqDto): Promise<AuthResDto> {
     return await this.authService.signIn(dto);
   }
-  @skipAuth()
+  @SkipAuth()
   @ApiBearerAuth()
   @UseGuards(JwtRefreshGuard)
   @ApiOperation({ summary: 'Refresh token pair' })
