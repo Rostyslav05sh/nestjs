@@ -1,11 +1,17 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { In } from 'typeorm';
 
+import { ArticleEntity } from '../../../database/entity/article.entity';
 import { TagEntity } from '../../../database/entity/tag.entity';
 import { IUserData } from '../../auth/interfaces/user-data.interface';
 import { ArticleRepository } from '../../repository/services/article.repository';
 import { TagRepository } from '../../repository/services/tag.repository';
 import { CreateArticleReqDto } from '../dto/req/create-article.req.dto';
+import { UpdateArticleReqDto } from '../dto/req/update-article.req.dto';
 import { ArticleResDto } from '../dto/res/article.res.dto';
 import { ArticleMapper } from './article.mapper';
 
@@ -47,17 +53,69 @@ export class ArticleService {
     return [...entities, ...newEntities];
   }
 
-  // public async update(
-  //   userData: IUserData,
-  //   dto: UpdateArticleReqDto,
-  // ): Promise<ArticleResDto> {
-  //   const user = await this.userRepository.findOneBy({ id: userData.userId });
-  //   if (!user) {
-  //     throw new NotFoundException('User not found');
-  //   }
-  //
-  //   const UpdatedUser = await this.userRepository.save({ ...user, ...dto });
-  //
-  //   return ArticleMapper.toResponseDTO(UpdatedUser);
-  // }
+  public async update(
+    userData: IUserData,
+    articleId: string,
+    dto: UpdateArticleReqDto,
+  ): Promise<ArticleResDto> {
+    const article = await this.findArticleOrThrow(userData.userId, articleId);
+    await this.articleRepository.save({ ...article, ...dto });
+    const updatedArticle = await this.articleRepository.findArticleById(
+      userData,
+      articleId,
+    );
+    return ArticleMapper.toResponseDTO(updatedArticle);
+  }
+
+  public async getById(
+    userData: IUserData,
+    articleId: string,
+  ): Promise<ArticleResDto> {
+    const article = await this.articleRepository.findArticleById(
+      userData,
+      articleId,
+    );
+    if (!article) {
+      throw new NotFoundException('Article not found');
+    }
+
+    return ArticleMapper.toResponseDTO(article);
+  }
+
+  public async delete(userData: IUserData, articleId: string): Promise<void> {
+    const article = await this.articleRepository.findArticleById(
+      userData,
+      articleId,
+    );
+    if (!article) {
+      throw new NotFoundException('Article not found');
+    }
+
+    await this.articleRepository.remove(article);
+  }
+
+  public async getList(userData: IUserData, query: any): Promise<any> {
+    const [article, total] = await this.articleRepository.getList(
+      userData,
+      query,
+    );
+
+    return { article, total };
+  }
+
+  private async findArticleOrThrow(
+    userId: string,
+    articleId: string,
+  ): Promise<ArticleEntity> {
+    const article = await this.articleRepository.findOneBy({
+      id: articleId,
+    });
+    if (!article) {
+      throw new NotFoundException('Article not found');
+    }
+    if (article.user_id !== userId) {
+      throw new ForbiddenException();
+    }
+    return article;
+  }
 }
