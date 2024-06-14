@@ -19,9 +19,11 @@ import {
 
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { IUserData } from '../auth/interfaces/user-data.interface';
+import { ArticleListReqDto } from './dto/req/article-list.req.dto';
 import { CreateArticleReqDto } from './dto/req/create-article.req.dto';
 import { UpdateArticleReqDto } from './dto/req/update-article.req.dto';
 import { ArticleResDto } from './dto/res/article.res.dto';
+import { ArticleListResDto } from './dto/res/article-list.res.dto';
 import { ArticleService } from './services/article.service';
 
 @ApiBearerAuth()
@@ -68,8 +70,8 @@ export class ArticleController {
   @Get()
   public async getList(
     @CurrentUser() userData: IUserData,
-    @Query() query: any,
-  ): Promise<ArticleResDto> {
+    @Query() query: ArticleListReqDto,
+  ): Promise<ArticleListResDto> {
     return await this.articleService.getList(userData, query);
   }
 

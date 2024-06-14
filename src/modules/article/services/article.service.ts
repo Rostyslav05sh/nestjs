@@ -10,9 +10,11 @@ import { TagEntity } from '../../../database/entity/tag.entity';
 import { IUserData } from '../../auth/interfaces/user-data.interface';
 import { ArticleRepository } from '../../repository/services/article.repository';
 import { TagRepository } from '../../repository/services/tag.repository';
+import { ArticleListReqDto } from '../dto/req/article-list.req.dto';
 import { CreateArticleReqDto } from '../dto/req/create-article.req.dto';
 import { UpdateArticleReqDto } from '../dto/req/update-article.req.dto';
 import { ArticleResDto } from '../dto/res/article.res.dto';
+import { ArticleListResDto } from '../dto/res/article-list.res.dto';
 import { ArticleMapper } from './article.mapper';
 
 @Injectable()
@@ -94,13 +96,16 @@ export class ArticleService {
     await this.articleRepository.remove(article);
   }
 
-  public async getList(userData: IUserData, query: any): Promise<any> {
+  public async getList(
+    userData: IUserData,
+    query: ArticleListReqDto,
+  ): Promise<ArticleListResDto> {
     const [article, total] = await this.articleRepository.getList(
       userData,
       query,
     );
 
-    return { article, total };
+    return ArticleMapper.toListResponseDTO(article, total, query);
   }
 
   private async findArticleOrThrow(
