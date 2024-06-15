@@ -8,7 +8,9 @@ export class UserMapper {
       name: user.name,
       email: user.email,
       bio: user.bio,
-      image: user.image,
+      image: user.image
+        ? `${process.env.AWS_S3_BUCKET_URL}/${user.image}`
+        : null,
       isFollowed: user.following ? user.following.length > 0 : false,
     };
   }

@@ -5,6 +5,8 @@ import {
 } from '@nestjs/common';
 
 import { IUserData } from '../../auth/interfaces/user-data.interface';
+import { ContentTypeEnum } from '../../file-upload/models/enum/content-type.enum';
+import { FileUploadService } from '../../file-upload/services/file-upload.service';
 import { FollowRepository } from '../../repository/services/follow.repository';
 import { UserRepository } from '../../repository/services/user.repository';
 import { UpdateUserReqDto } from '../dto/req/update-user.req.dto';
@@ -16,6 +18,7 @@ export class UserService {
   constructor(
     private readonly followRepository: FollowRepository,
     private readonly userRepository: UserRepository,
+    private readonly fileUploadService: FileUploadService,
   ) {}
 
   public async getMe(userData: IUserData): Promise<UserResDto> {
@@ -105,6 +108,29 @@ export class UserService {
     const user = await this.userRepository.findOneBy({ email });
     if (user) {
       throw new ConflictException('Email is already taken');
+    }
+  }
+
+  public async uploadAvatar(
+    userData: IUserData,
+    avatar: Express.Multer.File,
+  ): Promise<void> {
+    const image = await this.fileUploadService.uploadFile(
+      avatar,
+      ContentTypeEnum.AVATAR,
+      userData.userId,
+    );
+
+    await this.userRepository.update(userData.userId, { image });
+  }
+
+  public async deleteAvatar(userData: IUserData): Promise<void> {
+    const user = await this.userRepository.findOneBy({ id: userData.userId });
+
+    if (user) {
+      await this.userRepository.save(
+        await this.userRepository.merge(user, { image: null }),
+      );
     }
   }
 }
