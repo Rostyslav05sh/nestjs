@@ -44,5 +44,6 @@ export type AWSConfig = {
   accessKey: string;
   secretKey: string;
   bucketName: string;
+  bucketUrl: string;
   endpoint: string;
 };

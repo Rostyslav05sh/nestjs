@@ -86,4 +86,28 @@ export class ArticleController {
   ): Promise<ArticleResDto> {
     return await this.articleService.update(userData, articleId, dto);
   }
+
+  @ApiBearerAuth()
+  @ApiForbiddenResponse({ description: 'Forbidden' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiNotFoundResponse({ description: 'Not Found' })
+  @Post(':articleId/like')
+  public async like(
+    @CurrentUser() userData: IUserData,
+    @Param('articleId', ParseUUIDPipe) articleId: string,
+  ): Promise<void> {
+    await this.articleService.like(userData, articleId);
+  }
+
+  @ApiBearerAuth()
+  @ApiForbiddenResponse({ description: 'Forbidden' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiNotFoundResponse({ description: 'Not Found' })
+  @Delete(':articleId/like')
+  public async unlike(
+    @CurrentUser() userData: IUserData,
+    @Param('articleId', ParseUUIDPipe) articleId: string,
+  ): Promise<void> {
+    await this.articleService.unlike(userData, articleId);
+  }
 }

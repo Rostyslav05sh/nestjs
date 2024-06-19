@@ -9,6 +9,7 @@ import { ArticleEntity } from '../../../database/entity/article.entity';
 import { TagEntity } from '../../../database/entity/tag.entity';
 import { IUserData } from '../../auth/interfaces/user-data.interface';
 import { ArticleRepository } from '../../repository/services/article.repository';
+import { LikeRepository } from '../../repository/services/like.repository';
 import { TagRepository } from '../../repository/services/tag.repository';
 import { ArticleListReqDto } from '../dto/req/article-list.req.dto';
 import { CreateArticleReqDto } from '../dto/req/create-article.req.dto';
@@ -22,6 +23,7 @@ export class ArticleService {
   constructor(
     private readonly articleRepository: ArticleRepository,
     private readonly tagRepository: TagRepository,
+    private readonly likeRepository: LikeRepository,
   ) {}
 
   public async create(
@@ -106,6 +108,50 @@ export class ArticleService {
     );
 
     return ArticleMapper.toListResponseDTO(article, total, query);
+  }
+
+  public async like(userData: IUserData, articleId: string): Promise<void> {
+    const article = await this.articleRepository.findArticleById(
+      userData,
+      articleId,
+    );
+    if (!article) {
+      throw new NotFoundException('Not found article');
+    }
+
+    const like = await this.likeRepository.findOneBy({
+      article_id: articleId,
+      user_id: userData.userId,
+    });
+    if (like) {
+      throw new ForbiddenException('Already liked');
+    }
+
+    await this.likeRepository.save(
+      this.likeRepository.create({
+        article_id: articleId,
+        user_id: userData.userId,
+      }),
+    );
+  }
+  public async unlike(userData: IUserData, articleId: string): Promise<void> {
+    const article = await this.articleRepository.findArticleById(
+      userData,
+      articleId,
+    );
+    if (!article) {
+      throw new NotFoundException('Not found article');
+    }
+
+    const like = await this.likeRepository.findOneBy({
+      article_id: articleId,
+      user_id: userData.userId,
+    });
+    if (!like) {
+      throw new NotFoundException('Not found like');
+    }
+
+    await this.likeRepository.remove(like);
   }
 
   private async findArticleOrThrow(

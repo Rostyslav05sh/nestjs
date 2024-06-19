@@ -45,5 +45,11 @@ export class BaseArticleResDto {
   })
   tags: string[];
 
+  @ApiProperty({
+    example: true,
+    description: 'Is liked',
+  })
+  liked: boolean;
+
   user?: UserResDto;
 }

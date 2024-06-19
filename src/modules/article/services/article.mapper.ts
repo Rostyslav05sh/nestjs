@@ -13,6 +13,7 @@ export class ArticleMapper {
       body: entity.body,
       created: entity.created,
       updated: entity.updated,
+      liked: entity.likes.length > 0,
       tags: entity.tags ? entity.tags.map((tag) => tag.name) : [],
       user: entity.user ? UserMapper.toResponseDTO(entity.user) : null,
     };
